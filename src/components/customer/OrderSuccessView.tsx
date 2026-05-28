@@ -5,10 +5,10 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, MessageCircle, Home, Printer } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 import { storeSettings } from '@/lib/api';
-import { formatDate, generateWhatsAppLink } from '@/lib/helpers';
+import { formatDate, generateWhatsAppLink, generateOrderMessage, formatRupiah } from '@/lib/helpers';
 
 export default function OrderSuccessView() {
-  const { viewParams, navigate } = useAppStore();
+  const { viewParams, navigate, lastOrderDetails } = useAppStore();
   const [storeSetting, setStoreSetting] = useState<{ whatsappNumber: string; storeName: string } | null>(null);
   const orderNumber = viewParams.orderNumber || '';
   const orderId = viewParams.orderId || '';
@@ -28,8 +28,15 @@ export default function OrderSuccessView() {
 
   const handleOpenWhatsApp = () => {
     if (!storeSetting || !orderNumber) return;
-    // Generate a simplified message since we don't have full order data
-    const message = `Halo, saya baru saja membuat pesanan dengan nomor *${orderNumber}*. Mohon konfirmasi pesanan saya. Terima kasih!`;
+    
+    let message = '';
+    if (lastOrderDetails && lastOrderDetails.orderNumber === orderNumber) {
+      message = generateOrderMessage(lastOrderDetails);
+    } else {
+      // Fallback jika detail tidak tersedia atau nomor pesanan berbeda
+      message = `Halo, saya baru saja membuat pesanan dengan nomor *${orderNumber}*. Mohon konfirmasi pesanan saya. Terima kasih!`;
+    }
+    
     const link = generateWhatsAppLink(storeSetting.whatsappNumber, message);
     window.open(link, '_blank');
   };
@@ -102,11 +109,39 @@ export default function OrderSuccessView() {
 
           {/* Items */}
           <div>
-            <p className="text-gray-500 mb-2">ITEM PESANAN</p>
-            <div className="space-y-1.5">
-              <p className="text-gray-400 text-center italic">
-                Detail item lihat di WhatsApp
-              </p>
+            <p className="text-gray-500 mb-2 font-bold">ITEM PESANAN</p>
+            <div className="space-y-2">
+              {lastOrderDetails && lastOrderDetails.orderNumber === orderNumber ? (
+                <>
+                  <div className="space-y-1">
+                    {lastOrderDetails.items.map((item: any, idx: number) => (
+                      <div key={idx} className="flex justify-between">
+                        <span className="text-gray-700">{item.name} x{item.quantity}</span>
+                        <span className="text-gray-900 font-bold">{formatRupiah(item.price * item.quantity)}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="border-t border-dashed border-gray-200 my-2" />
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Subtotal</span>
+                    <span className="text-gray-800">{formatRupiah(lastOrderDetails.subtotal)}</span>
+                  </div>
+                  {lastOrderDetails.shippingCost > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Ongkir</span>
+                      <span className="text-gray-800">{formatRupiah(lastOrderDetails.shippingCost)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-sm font-bold mt-1">
+                    <span className="text-gray-900">TOTAL</span>
+                    <span className="text-emerald-600 font-bold">{formatRupiah(lastOrderDetails.total)}</span>
+                  </div>
+                </>
+              ) : (
+                <p className="text-gray-400 text-center italic">
+                  Detail item lihat di WhatsApp
+                </p>
+              )}
             </div>
           </div>
 

@@ -21,6 +21,7 @@ export default function CheckoutView() {
     getTotalDiscount,
     getTotal,
     clearCart,
+    setLastOrderDetails,
   } = useAppStore();
 
   const [customerName, setCustomerName] = useState('');
@@ -87,7 +88,24 @@ export default function CheckoutView() {
       if (res.success && res.data) {
         const order = res.data;
 
-        // Generate WhatsApp message
+        // Simpan detail pesanan terakhir ke store sebelum keranjang dikosongkan
+        setLastOrderDetails({
+          orderNumber: order.orderNumber,
+          items: items.map((item) => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.discountPrice ?? item.price,
+          })),
+          subtotal,
+          shippingCost,
+          total,
+          deliveryMethod,
+          customerAddress: customerAddress.trim(),
+          customerName: customerName.trim(),
+          customerPhone: customerPhone.trim(),
+        });
+
+        // Generate WhatsApp message (jika tidak diblokir browser, ini akan terbuka otomatis)
         if (storeSetting) {
           const message = generateOrderMessage({
             orderNumber: order.orderNumber,

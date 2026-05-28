@@ -268,15 +268,19 @@ const createAdminAuthSlice = (set: any, get: any) => ({
 interface UIState {
   showSearch: boolean;
   showPromoPopup: boolean;
+  lastOrderDetails: any | null;
   setShowSearch: (show: boolean) => void;
   setShowPromoPopup: (show: boolean) => void;
+  setLastOrderDetails: (order: any | null) => void;
 }
 
 const createUISlice = (set: any) => ({
   showSearch: false,
   showPromoPopup: false,
+  lastOrderDetails: null,
   setShowSearch: (show: boolean) => set({ showSearch: show }),
   setShowPromoPopup: (show: boolean) => set({ showPromoPopup: show }),
+  setLastOrderDetails: (order: any | null) => set({ lastOrderDetails: order }),
 });
 
 // ============================================================
@@ -323,6 +327,7 @@ export const useAppStore = create<AppStore>()(
         admin: (state as AdminAuthState).admin,
         token: (state as AdminAuthState).token,
         sessionId: (state as SessionState).sessionId,
+        lastOrderDetails: (state as any).lastOrderDetails,
       }),
       merge: (persistedState: any, currentState: AppStore) => {
         return {
