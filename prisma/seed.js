@@ -53,10 +53,10 @@ async function main() {
 
   // 3. Create Categories
   const categoriesData = [
-    { name: 'Makanan', icon: 'Utensils', sortOrder: 1 },
-    { name: 'Minuman', icon: 'CupSoda', sortOrder: 2 },
-    { name: 'Kebutuhan Harian', icon: 'ShoppingBag', sortOrder: 3 },
-    { name: 'Elektronik', icon: 'Smartphone', sortOrder: 4 },
+    { name: 'Makanan', icon: '🍔', sortOrder: 1 },
+    { name: 'Minuman', icon: '🥤', sortOrder: 2 },
+    { name: 'Kebutuhan Harian', icon: '🧼', sortOrder: 3 },
+    { name: 'Elektronik', icon: '📱', sortOrder: 4 },
   ];
 
   const categories = [];
